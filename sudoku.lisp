@@ -5,18 +5,16 @@
   (intern (format nil "S~a~a~a" a b c)))
 
 
+(defmacro big ((op var start end) &body body)
+  `(cons (quote ,op)
+	 (loop for ,var from ,start to ,end
+	       collect
+	       ,@body)))
+
+
 (defun clauses-1 ()
   "There is at least one number in each entry"
-  (cons 'and*
-	(loop for x from 1 to 9
-	      collect 
-	      (cons 'and*
-		    (loop for y from 1 to 9
-			  collect 
-			  (cons 'or*
-				(loop for z from 1 to 9
-				      collect
-				      (atomic x y z))))))))
+  (big (and x 1 9) (big (and y 1 9) (big (or z 1 9) (atomic x z y)))))
 
 
 (defun clauses-2 ()
@@ -61,4 +59,5 @@
 
 ;; testando
 ;; (prove* `(and* ,(clauses-3) ,(clauses-2) ,(clauses-1)))
+
 

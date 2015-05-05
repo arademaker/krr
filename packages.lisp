@@ -17,17 +17,5 @@
    #:find-all-if
    #:compose))
 
-(defpackage #:gps-1
-  (:use #:cl #:utils))
-
-(defpackage #:gps-2
-  (:use #:cl #:utils))
-
-(defpackage #:eliza
-  (:use #:cl #:utils))
-
-(defpackage #:katabank
-  (:use #:cl #:utils))
-
 (defpackage #:tableaux
   (:use #:cl #:utils :optima))
