@@ -23,7 +23,12 @@
 
 
 (defun test-vestidos ()
-  (let ((res nil))
-    (push (prove `(implies ,(vestidos) (and MA (and CB AP)))) res)
-    (dolist (outras '(MA CB AP MP MB CA CP AA AB) (reverse res))
-      (push (prove `(implies ,(vestidos) ,outras)) res))))
+  (labels ((present (branch)
+	     (remove-duplicates	(remove-if (lambda (frm) (equal 'false (formula-sign frm)))
+					   branch)
+				:test #'equal?)))
+    (mapcar #'present
+	    (prove `(not ,(vestidos))))))
+
+
+

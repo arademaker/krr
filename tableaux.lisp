@@ -9,6 +9,13 @@
 (defmethod print-object ((frm formula) stream)
   (format stream "<[~a] ~a>" (formula-sign frm) (formula-frm frm)))
 
+(defgeneric equal? (f1 f2))
+
+(defmethod equal? ((f1 formula) (f2 formula))
+  (and (equal (formula-sign f1) (formula-sign f2))
+       (equal (formula-frm f1) (formula-frm f2))))
+
+
 (defun atomic? (formula)
   (not (listp (formula-frm formula))))
 
@@ -100,6 +107,16 @@
 	    (expand-branches (cdr lolf) branch branches)))))
 
 
+;; (defun split (branches)
+;;   (labels ((split-aux (branches derivable non-derivable)
+;; 	     (if (null branches)
+;; 		 (values derivable non-derivable)
+;; 		 (let ((b (car branches)))
+;; 		   (if (full-expanded? b)
+;; 		       (split-aux (cdr branches) derivable (cons b non-derivable))
+;; 		       (split-aux (cdr branches) (cons b derivable) non-derivable))))))
+;;     (split-aux branches nil nil)))
+
 (defun split (branches)
   (labels ((split-aux (branches derivable non-derivable)
 	     (if (null branches)
@@ -107,8 +124,10 @@
 		 (let ((b (car branches)))
 		   (if (full-expanded? b)
 		       (split-aux (cdr branches) derivable (cons b non-derivable))
-		       (split-aux (cdr branches) (cons b derivable) non-derivable))))))
+		       (values (cons b derivable) 
+			       (append (cdr branches) non-derivable)))))))
     (split-aux branches nil nil)))
+
 
 
 (defun prove-step (branches)
@@ -120,6 +139,28 @@
 	  (expand-branches news branch-rest 
 			   (append (cdr derivable) non-derivable)))
 	branches)))
+
+
+(defun wff? (wff)
+  (let ((ops '(and or implies not))) 
+    (cond 
+      ((and wff (atom wff) (symbolp wff)) t)
+      ((and (listp wff)
+	    (member (car wff) ops :test #'equal)
+	    (wff? (cadr wff))
+	    (wff? (caddr wff))) t) 
+      (t nil))))
+
+(defun preproc (wff)
+  (let ((trans '((or* . or) (and* . and))))
+    (if (and (atom wff) (symbolp wff))
+	wff
+	(let ((op (if (member (car wff) '(or* and*) :test #'equal)
+		      (cdr (assoc (car wff) trans))
+		      (car wff)))) 
+	  (if (> (length wff) 2) 
+	      (reduce (lambda (a b) `(,op ,a ,b)) (mapcar #'preproc (cdr wff)))
+	      `(,op ,(preproc (cadr wff))))))))
 
 
 (defun prove (wff)
