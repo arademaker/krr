@@ -1,0 +1,15 @@
+#+Title: Knowledge Representation and Reasoning
+
+Projeto do curso de Estrutura de Dados 2015, EMAP/FGV. Iremos
+implementar alguns algoritmos para representação e reasoning de lógica
+proposicional e primeira ordem. Seguiremos, com alguns desvios, o
+livro [[http://www.amazon.com/Knowledge-Representation-Reasoning-Artificial-Intelligence/dp/1558609326][Knowledge Representation and Reasoning]].
+
+O projeto faz parte da avaliação dos alunos da disciplinas mas outras
+colaborações são bem vindas.
+
+Usaremos os Issues do projeto para compartilhar demandas de
+colaboração.
+
+
+
