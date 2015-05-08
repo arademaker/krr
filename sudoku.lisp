@@ -103,9 +103,9 @@
   	         ,(clauses-5) ,(clauses-6) ,(clauses-7) ,(clauses-8))))
 
 
-; Example call of solve-sudoku
-; (solve-sudoku '(S121 S138 S177 S243 S272 S327 S457 S461 S516 S584 S613 S714 S745 S793 S822 S858 S986))
-; from figure 1 example in page 2 of http://ldc.usb.ve/~meza/ci-5651/e-m2008/articulosYsoftware/SudokuAsSAT.pdf
+(setf table '(S121 S138 S177 S243 S272 S327 S457 S461 S516 S584 S613 S714 S745 S793 S822 S858 S986))
+; Example from figure 1 in page 2 of http://ldc.usb.ve/~meza/ci-5651/e-m2008/articulosYsoftware/SudokuAsSAT.pdf
+
 
 (defun solve-sudoku (table)
   "Solve sudoku from already positioned numbers"
