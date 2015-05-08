@@ -173,11 +173,14 @@
        (t nil)))
 
 (defun prove (wff)
-  (do ((branches (list (list (make-formula 'false wff)))
-		 (prove-step branches)))
-      ((or (null branches)
-	   (every #'full-expanded? branches)) 
-       branches)))
+  (let ((form (preproc wff)))
+    (if form
+      (do ((branches (list (list (make-formula 'false wff)))
+		     (prove-step branches)))
+          ((or (null branches)
+	       (every #'full-expanded? branches)) 
+           branches))
+    (error "Fórmula inválida"))))
 
 
 (defun test-1 ()
