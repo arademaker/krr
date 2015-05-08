@@ -99,8 +99,8 @@
 
 
 (defun all-clauses ()
-  `(and ,(clauses-1) ,(clauses-2) ,(clauses-3) ,(clauses-4)
-  	,(clauses-5) ,(clauses-6) ,(clauses-7) ,(clauses-8)))
+  (preproc `(and ,(clauses-1) ,(clauses-2) ,(clauses-3) ,(clauses-4)
+  	         ,(clauses-5) ,(clauses-6) ,(clauses-7) ,(clauses-8))))
 
 
 ; Example call of solve-sudoku
@@ -109,4 +109,4 @@
 
 (defun solve-sudoku (table)
   "Solve sudoku from already positioned numbers"
-  (prove `(and ,table ,(all-clauses))))
+  (prove `(and ,(all-clauses) ,(preproc (cons 'and table)))))
