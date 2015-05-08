@@ -104,7 +104,7 @@
 
 
 ; Example call of solve-sudoku
-; (solve-sudoku '(S121 S138 S177 S243 S272 S327 S457 S461 S516 S564 S613 S714 S745 S793 S822 S858 S986))
+; (solve-sudoku '(S121 S138 S177 S243 S272 S327 S457 S461 S516 S584 S613 S714 S745 S793 S822 S858 S986))
 ; from figure 1 example in page 2 of http://ldc.usb.ve/~meza/ci-5651/e-m2008/articulosYsoftware/SudokuAsSAT.pdf
 
 (defun solve-sudoku (elts)
