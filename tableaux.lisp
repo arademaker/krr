@@ -155,6 +155,10 @@
      (cons (car formula) (mapcar #'preproc (cdr formula))))
     ((and (listp formula)
 	  (member (car formula) '(and or) :test #'equal)
+	  (= (length formula) 2))
+     (preproc (cadr formula)))
+    ((and (listp formula)
+	  (member (car formula) '(and or) :test #'equal)
 	  (> (length formula) 2))
      (reduce #'(lambda (x y) `(,(car formula) ,x ,y))
 	     (mapcar #'preproc (cdr formula))))
@@ -166,7 +170,8 @@
 		 (prove-step branches)))
       ((or (null branches)
 	   (every #'full-expanded? branches)) 
-       branches)))
+       branches)
+    (dbg :tableaux "Branches: ~a~%" (length branches))))
 
 
 (defun test-1 ()
