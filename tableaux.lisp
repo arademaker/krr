@@ -6,6 +6,7 @@
   ((sign    :initform nil :initarg :sign :accessor formula-sign)
    (frm     :initform nil :initarg :frm  :accessor formula-frm)))
 
+
 (defmethod print-object ((frm formula) stream)
   (format stream "<[~a] ~a>" (formula-sign frm) (formula-frm frm)))
 
@@ -144,21 +145,26 @@
 (defun preproc (formula)
   (cond 
     ((and (atom formula)
-	  (symbolp formula)) formula)
+	  (symbolp formula))
+     formula)
     ((and (listp formula)
 	  (equal (car formula) 'not)
 	  (= (length formula) 2))
-     `(,(car formula) ,(preproc (cadr formula))))
+     (list (car formula) (preproc (cadr formula))))
     ((and (listp formula)
 	  (equal (car formula) 'implies)
 	  (= (length formula) 3))
      (cons (car formula) (mapcar #'preproc (cdr formula))))
     ((and (listp formula)
 	  (member (car formula) '(and or) :test #'equal)
+	  (= (length formula) 2))
+     (preproc (cadr formula)))
+    ((and (listp formula)
+	  (member (car formula) '(and or) :test #'equal)
 	  (> (length formula) 2))
-     (reduce #'(lambda (x y) `(,(car formula) ,x ,y))
+     (reduce (lambda (x y) (list (car formula) x y))
 	     (mapcar #'preproc (cdr formula))))
-    (t (error "Invalid Formula"))))
+    (t (error "Invalid Formula ~a" formula))))
 
 
 (defun prove (wff)
@@ -166,16 +172,5 @@
 		 (prove-step branches)))
       ((or (null branches)
 	   (every #'full-expanded? branches)) 
-       branches)))
-
-
-(defun test-1 ()
-  (format t "~{~{~a ~^=> ~}~%~}" 
-	  (mapcar (lambda (f) (list f (prove f))) 
-		  (list '(and A B)
-			'(or A B)
-			'A
-			'(implies (or A B) (and A B))
-			'(implies (and A B) (or A B))
-			'(implies (not (not A)) A)
-			'(implies A (not (not A)))))))
+       branches)
+    (dbg :tableaux "Branches: ~a~%" (length branches))))

@@ -1,7 +1,7 @@
 ;;
 (in-package :utils)
 
-(setf (symbol-function 'find-all-if) #'remove-if-not)
+;; (setf (symbol-function 'find-all-if) #'remove-if-not)
 
 (defun compose (f g)
   #'(lambda (x) (funcall f (funcall g x))))
@@ -9,13 +9,13 @@
 ;; (defun complemento (fn)
 ;;   (lambda (&rest args) (not (apply fn args))))
 
-(defun find-all (item sequence &rest keyword-args
-		 &key (test #'eql) test-not &allow-other-keys)
-  (if test-not
-      (apply #'remove item sequence
-	     :test-not (complement test-not) keyword-args)
-      (apply #'remove item sequence
-	     :test (complement test) keyword-args)))
+;; (defun find-all (item sequence &rest keyword-args
+;; 		 &key (test #'eql) test-not &allow-other-keys)
+;;   (if test-not
+;;       (apply #'remove item sequence
+;; 	     :test-not (complement test-not) keyword-args)
+;;       (apply #'remove item sequence
+;; 	     :test (complement test) keyword-args)))
 
 (defun mappend (fn the-list)
   (apply #'append (mapcar fn the-list)))
