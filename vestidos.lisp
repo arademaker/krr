@@ -22,13 +22,10 @@
     (reduce (lambda (a b) `(and ,a ,b)) theory)))
 
 
-(defun test-vestidos ()
+(defun test-vestidos (frm)
   (labels ((present (branch)
-	     (remove-duplicates	(remove-if (lambda (frm) (equal 'false (formula-sign frm)))
+	     (remove-duplicates	(remove-if (lambda (frm)
+					     (equal 'false (formula-sign frm)))
 					   branch)
 				:test #'equal?)))
-    (mapcar #'present
-	    (prove `(not ,(vestidos))))))
-
-
-
+    (mapcar #'present (prove frm))))
