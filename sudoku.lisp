@@ -104,8 +104,9 @@
 
 
 (defparameter *sudoku-1*
-  '(and S121 S138 S177 S243 S272 S327 S457 S461 S516 S584 S613 S714 S745 S793 S822 S858 S986))
+  `(and ,(all-clauses)
+	S121 S138 S177 S243 S272 S327 S457 S461 S516 S584
+	S613 S714 S745 S793 S822 S858 S986))
 
-(defun solve-sudoku (table)
-  (prove `(and ,(all-clauses) ,table)))
-
+(defparameter *sudoku-2*
+  `(not ,*sudoku-1*))
