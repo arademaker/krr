@@ -1,5 +1,5 @@
 
-(in-package :tableaux)
+(in-package :tableaux-test)
 
 
 (defun atomic (a b c)

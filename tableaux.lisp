@@ -167,10 +167,10 @@
     (t (error "Invalid Formula ~a" formula))))
 
 
-(defun prove (wff)
+(defun prove (wff &key (test #'every))
   (do ((branches (list (list (make-formula 'false (preproc wff))))
 		 (prove-step branches)))
       ((or (null branches)
-	   (every #'full-expanded? branches)) 
-       branches)
+	   (funcall test #'full-expanded? branches)) 
+       (remove-if-not #'full-expanded? branches))
     (dbg :tableaux "Branches: ~a~%" (length branches))))
