@@ -143,6 +143,8 @@
 
 (defun preproc (formula)
   (cond 
+     ((and (equal (length wff) 3) (equal (car wff) 'equiv))
+        (preproc `(and (implies ,(cdr wff)) (implies ,(reverse (cdr wff))))))
     ((and (atom formula)
 	  (symbolp formula))
      formula)
