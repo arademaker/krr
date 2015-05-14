@@ -2,7 +2,7 @@
 (in-package :tableaux)
 
 (defmacro by-person (a b c)
-  `(quote ((or (or ,a ,b) ,c)
+  `(quote ((or ,a ,b ,c)
 	   (implies ,a (and (not ,b) (not ,c)))
 	   (implies ,b (and (not ,a) (not ,c)))
 	   (implies ,c (and (not ,a) (not ,b))))))
@@ -14,12 +14,12 @@
 			(by-person MA AA CA)
 			(by-person MB AB CB)
 			(by-person MP AP CP)
-			; agora considerando o que cada uma diz:
+			;; agora considerando o que cada uma diz
 			(list '(implies AA AB)
 			      '(implies CA (not AB))
 			      '(not AB)
 			      '(implies AP CB)))))
-    (reduce (lambda (a b) `(and ,a ,b)) theory)))
+    (cons 'and theory)))
 
 
 (defun test-vestidos (frm)
@@ -28,4 +28,4 @@
 					     (equal 'false (formula-sign frm)))
 					   branch)
 				:test #'equal?)))
-    (mapcar #'present (prove frm))))
+    (remove-duplicates (mapcar #'present (prove frm)) :test #'equal)))

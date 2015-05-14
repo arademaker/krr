@@ -104,8 +104,21 @@
 
 
 (defparameter *sudoku-1*
-  '(and S121 S138 S177 S243 S272 S327 S457 S461 S516 S584 S613 S714 S745 S793 S822 S858 S986))
+  `(and ,(all-clauses)
+	S121 S138 S177 S243 S272 S327 S457 S461 S516 S584
+	S613 S714 S745 S793 S822 S858 S986))
 
-(defun solve-sudoku (table)
-  (prove `(and ,(all-clauses) ,table)))
+(defparameter *sudoku-2*
+  `(not ,*sudoku-1*))
 
+
+(defun sudoku (branch)
+  (labels ((topos (atom)
+	     (cdr (loop for c across (symbol-name atom)
+			collect (digit-char-p c)))))
+    (let ((table (make-array '(9 9))))
+      (dolist (frm branch table)
+	(if (and (atomic? frm)
+		 (equal 'true (formula-sign frm)))
+	    (let ((pos (topos (formula-frm frm))))
+	      (setf (aref table (car pos) (cadr pos)) (caddr pos))))))))

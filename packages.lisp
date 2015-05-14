@@ -18,4 +18,7 @@
    #:compose))
 
 (defpackage #:tableaux
-  (:use #:cl #:utils :optima))
+  (:use #:cl #:utils #:optima)
+  (:export
+   #:prove))
+
