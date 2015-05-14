@@ -1,0 +1,30 @@
+#+Title: Some Examples
+#+Author: Alexandre Rademaker
+
+
+#+name:test
+- (and A B)
+- (or A B)
+- A
+- (implies (or A B) (and A B))
+- (implies (and A B) (or A B))
+- (implies (not (not A)) A)
+- (implies A (not (not A)))
+
+
+#+BEGIN_SRC lisp :var frms=test :package "tableaux-test" :results list
+  (mapcar (lambda (line)
+            (let ((bs (prove (read-from-string line))))
+              (or bs 'tautology)))
+          frms)
+#+END_SRC
+
+#+RESULTS:
+- ((< [false] B>) (< [false] A>))
+- ((< [false] B> < [false] A>))
+- ((< [false] A>))
+- ((< [true] B> < [false] A>) (< [true] A> < [false] B>))
+- tautology
+- tautology
+- tautology
+

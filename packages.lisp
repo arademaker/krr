@@ -18,4 +18,13 @@
    #:compose))
 
 (defpackage #:tableaux
-  (:use #:cl #:utils :optima))
+  (:use #:cl #:utils #:optima)
+  (:export
+   #:prove
+   #:implies
+   #:formula-sign
+   #:formula-frm
+   #:equal?))
+
+(defpackage #:tableaux-test
+  (:use #:cl #:tableaux))
