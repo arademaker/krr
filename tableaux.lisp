@@ -130,7 +130,6 @@
     (split-aux branches nil nil)))
 
 
-
 (defun prove-step (branches)
   (multiple-value-bind (derivable non-derivable)
       (split branches)
