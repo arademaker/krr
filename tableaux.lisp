@@ -169,8 +169,9 @@
 
 (defun prove (wff)
   (do ((branches (list (list (make-formula 'false (preproc wff))))
-		 (prove-step branches)))
+		 (prove-step branches))
+       (expanded nil (find-if #'full-expanded? branches)))
       ((or (null branches)
-	   (every #'full-expanded? branches)) 
-       branches)
+	   expanded) 
+       expanded)
     (dbg :tableaux "Branches: ~a~%" (length branches))))
