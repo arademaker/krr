@@ -130,7 +130,6 @@
     (split-aux branches nil nil)))
 
 
-
 (defun prove-step (branches)
   (multiple-value-bind (derivable non-derivable)
       (split branches)
@@ -147,6 +146,8 @@
     ((and (atom formula)
 	  (symbolp formula))
      formula)
+     ((and (equal (length formula) 3) (equal (car formula) 'equiv))
+        (preproc `(and ,(cons 'implies (cdr formula)) ,(cons 'implies (reverse (cdr formula))))))
     ((and (listp formula)
 	  (equal (car formula) 'not)
 	  (= (length formula) 2))
