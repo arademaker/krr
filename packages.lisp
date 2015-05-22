@@ -27,4 +27,4 @@
    #:equal?))
 
 (defpackage #:tableaux-test
-  (:use #:cl #:tableaux))
+  (:use #:cl #:tableaux :utils))
