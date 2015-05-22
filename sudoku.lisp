@@ -74,7 +74,7 @@
 				      (not ,(atomic (+ k (* 3 i)) (+ l (* 3 j)) z))))))))))))
 
 
-(defun clauses-4b-1 ()
+(defun clauses-4b ()
   "Each number appears at most once in each 3x3 sub-grid"
   `(and
     ,(big (and z 1 9)
