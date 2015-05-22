@@ -22,6 +22,7 @@
   (:export
    #:prove
    #:implies
+   #:equiv
    #:formula-sign
    #:formula-frm
    #:equal?))
