@@ -164,6 +164,11 @@
 	  (> (length formula) 2))
      (reduce (lambda (x y) (list (car formula) x y))
 	     (mapcar #'preproc (cdr formula))))
+    ((and (listp formula)
+	  (> (length formula) 1)
+	  (symbolp (car formula))
+	  (every #'variable? (cdr formula)))
+     formula)
     (t (error "Invalid Formula ~a" formula))))
 
 
