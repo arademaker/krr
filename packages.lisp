@@ -20,5 +20,12 @@
 (defpackage #:tableaux
   (:use #:cl #:utils #:optima)
   (:export
-   #:prove))
+   #:prove
+   #:implies
+   #:equiv
+   #:formula-sign
+   #:formula-frm
+   #:equal?))
 
+(defpackage #:tableaux-test
+  (:use #:cl #:tableaux :utils))
