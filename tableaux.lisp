@@ -130,7 +130,6 @@
     (split-aux branches nil nil)))
 
 
-
 (defun prove-step (branches)
   (multiple-value-bind (derivable non-derivable)
       (split branches)
@@ -147,6 +146,8 @@
     ((and (atom formula)
 	  (symbolp formula))
      formula)
+     ((and (equal (length formula) 3) (equal (car formula) 'equiv))
+        (preproc `(and ,(cons 'implies (cdr formula)) ,(cons 'implies (reverse (cdr formula))))))
     ((and (listp formula)
 	  (equal (car formula) 'not)
 	  (= (length formula) 2))
@@ -164,19 +165,13 @@
 	  (> (length formula) 2))
      (reduce (lambda (x y) (list (car formula) x y))
 	     (mapcar #'preproc (cdr formula))))
-    ((and (listp formula)
-	  (> (length formula) 1)
-	  (symbolp (car formula))
-	  (every #'variable? (cdr formula)))
-     formula)
     (t (error "Invalid Formula ~a" formula))))
 
 
-(defun prove (wff)
+(defun prove (wff &key (test #'every))
   (do ((branches (list (list (make-formula 'false (preproc wff))))
-		 (prove-step branches))
-       (expanded nil (find-if #'full-expanded? branches)))
+		 (prove-step branches)))
       ((or (null branches)
-	   expanded) 
-       expanded)
+	   (funcall test #'full-expanded? branches)) 
+       (remove-if-not #'full-expanded? branches))
     (dbg :tableaux "Branches: ~a~%" (length branches))))
