@@ -12,7 +12,7 @@
 - (implies A (not (not A)))
 
 
-#+BEGIN_SRC lisp :var frms=test :package "tableaux" :results list
+#+BEGIN_SRC lisp :var frms=test :package "tableaux-test" :results list
   (mapcar (lambda (line)
             (let ((bs (prove (read-from-string line))))
               (or bs 'tautology)))
