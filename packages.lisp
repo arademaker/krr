@@ -16,9 +16,16 @@
    #:random-elt
    #:find-all-if
    #:compose))
+   
+(defpackage #:fol
+  (:use #:cl #:utils)
+  (:export 
+   #:troca
+   #:variable?
+   #:preproc))
 
 (defpackage #:tableaux
-  (:use #:cl #:utils #:optima)
+  (:use #:cl #:utils #:optima #:fol)
   (:export
    #:prove
    #:implies
