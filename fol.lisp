@@ -2,5 +2,11 @@
   (and (symbolp x)
        (equal (char (symbol-name x) 0) #\?)))
 
-;sugestao de representacao da formula "∀y.P(x)∧∃x[P(y)∨Q(x)]":
-;(and (forall '?y 'P(x)) (exists '?x (or (P(y) Q(x)))))
+(defun length-form (form)
+  (if (> (length form) 0)
+      (if (atom (car form))
+          (if (member (car form) '(implies and or equiv))
+              (+ 1 (length-form (cdr form)))
+              (length-form (cdr form)))
+          (+ (length-form (car form)) (length-form (cdr form))))
+      0))
