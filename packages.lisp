@@ -22,7 +22,11 @@
   (:export 
    #:pre-aux
    #:variable?
-   #:preproc))
+   #:preproc
+   #:forall
+   #:exists
+   #:implies
+   #:equiv))
 
 (defpackage #:tableaux
   (:use #:cl #:utils #:optima #:fol)
