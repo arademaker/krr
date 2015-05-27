@@ -20,7 +20,7 @@
 (defpackage #:fol
   (:use #:cl #:utils)
   (:export 
-   #:troca
+   #:pre-aux
    #:variable?
    #:preproc))
 
