@@ -20,7 +20,6 @@
 (defpackage #:fol
   (:use #:cl #:utils)
   (:export 
-   #:pre-aux
    #:variable?
    #:preproc
    #:forall
@@ -39,4 +38,4 @@
    #:equal?))
 
 (defpackage #:tableaux-test
-  (:use #:cl #:tableaux :utils))
+  (:use :cl :tableaux :utils :fol))
