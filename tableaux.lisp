@@ -141,33 +141,6 @@
 	branches)))
 
 
-(defun preproc (formula)
-  (cond 
-    ((and (atom formula)
-	  (symbolp formula))
-     formula)
-     ((and (equal (length formula) 3) (equal (car formula) 'equiv))
-        (preproc `(and ,(cons 'implies (cdr formula)) ,(cons 'implies (reverse (cdr formula))))))
-    ((and (listp formula)
-	  (equal (car formula) 'not)
-	  (= (length formula) 2))
-     (list (car formula) (preproc (cadr formula))))
-    ((and (listp formula)
-	  (equal (car formula) 'implies)
-	  (= (length formula) 3))
-     (cons (car formula) (mapcar #'preproc (cdr formula))))
-    ((and (listp formula)
-	  (member (car formula) '(and or) :test #'equal)
-	  (= (length formula) 2))
-     (preproc (cadr formula)))
-    ((and (listp formula)
-	  (member (car formula) '(and or) :test #'equal)
-	  (> (length formula) 2))
-     (reduce (lambda (x y) (list (car formula) x y))
-	     (mapcar #'preproc (cdr formula))))
-    (t (error "Invalid Formula ~a" formula))))
-
-
 (defun prove (wff &key (test #'every))
   (do ((branches (list (list (make-formula 'false (preproc wff))))
 		 (prove-step branches)))
