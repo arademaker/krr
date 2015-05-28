@@ -1,0 +1,12 @@
+(defun variable-p (x)
+  (and (symbolp x)
+       (equal (char (symbol-name x) 0) #\?)))
+
+(defun length-form (form)
+  (if (> (length form) 0)
+      (if (atom (car form))
+          (if (member (car form) '(implies and or equiv))
+              (+ 1 (length-form (cdr form)))
+              (length-form (cdr form)))
+          (+ (length-form (car form)) (length-form (cdr form))))
+      0))
