@@ -25,7 +25,8 @@
    #:forall
    #:exists
    #:implies
-   #:equiv))
+   #:equiv
+   #:to-cnf))
 
 (defpackage #:tableaux
   (:use #:cl #:utils #:optima #:fol)
