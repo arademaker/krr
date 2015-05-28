@@ -5,14 +5,17 @@
   (and (symbolp x)
        (equal (char (symbol-name x) 0) #\?)))
 
-(defun length-form (form)
-  (if (> (length form) 0)
+
+(defun length-form (form &optional (n 0))
+  (if (null form)
+      n
       (if (atom (car form))
           (if (member (car form) '(implies and or equiv))
-              (+ 1 (length-form (cdr form)))
-              (length-form (cdr form)))
-          (+ (length-form (car form)) (length-form (cdr form))))
-      0))
+              (length-form (cdr form) (+ n 1))
+              (length-form (cdr form) n))
+          (progn
+	    (length-form (cdr form)
+			 (+ n (length-form (car form))))))))
 
 
 (defun preproc (formula &optional (i 1))
