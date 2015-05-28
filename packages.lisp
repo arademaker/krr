@@ -21,6 +21,7 @@
   (:use #:cl #:utils)
   (:export 
    #:variable?
+   #:literal?
    #:preproc
    #:forall
    #:exists
@@ -32,8 +33,6 @@
   (:use #:cl #:utils #:optima #:fol)
   (:export
    #:prove
-   #:implies
-   #:equiv
    #:formula-sign
    #:formula-frm
    #:equal?))

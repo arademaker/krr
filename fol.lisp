@@ -88,13 +88,10 @@
   (cond ((atom form) 
 	 form)
 	((equal (car form) 'implies) 
-	 `(or (not ,(remove-implies (cadr form))) ,(remove-implies (caddr form))))
-	((equal (car form) 'or)
-	 `(or ,(remove-implies (cadr form)) ,(remove-implies (caddr form))))
-	((equal (car form) 'and)
-	 `(and ,(remove-implies (cadr form)) ,(remove-implies (caddr form))))
-	((equal (car form) 'not)
-	 `(not ,(remove-implies (cadr form))))))
+	 `(or (not ,(remove-implies (cadr form)))
+	      ,(remove-implies (caddr form))))
+	(t
+	 (mapcar #'remove-implies form))))
 
 
 (defun move-not (form)
