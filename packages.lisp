@@ -20,23 +20,22 @@
 (defpackage #:fol
   (:use #:cl #:utils)
   (:export 
-   #:pre-aux
    #:variable?
+   #:literal?
    #:preproc
    #:forall
    #:exists
    #:implies
-   #:equiv))
+   #:equiv
+   #:to-cnf))
 
 (defpackage #:tableaux
   (:use #:cl #:utils #:optima #:fol)
   (:export
    #:prove
-   #:implies
-   #:equiv
    #:formula-sign
    #:formula-frm
    #:equal?))
 
 (defpackage #:tableaux-test
-  (:use #:cl #:tableaux :utils))
+  (:use :cl :tableaux :utils :fol))

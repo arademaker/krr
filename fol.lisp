@@ -1,10 +1,27 @@
+
 (in-package :fol)
 
+(defun variable? (x)
+  (and (symbolp x)
+       (equal (char (symbol-name x) 0) #\?)))
 
-(defun variable? (v)
-  (and (symbolp v)
-       (equal (elt (symbol-name v) 0) #\?)))
-       
+(defun literal? (form) 
+  (or (atom form)
+      (and (equal (car form) 'not)
+	   (literal? (cadr form)))))
+
+
+(defun length-form (form &optional (n 0))
+  (if (null form)
+      n
+      (if (atom (car form))
+          (if (member (car form) '(implies and or equiv))
+              (length-form (cdr form) (+ n 1))
+              (length-form (cdr form) n))
+          (progn
+	    (length-form (cdr form)
+			 (+ n (length-form (car form))))))))
+
 
 (defun preproc (formula &optional (i 1))
   (cond 
@@ -14,18 +31,21 @@
      (values formula i))
     ((and (= (length formula) 3)
 	  (equal (car formula) 'equiv))
-     (multiple-value-bind (f k) (pre-aux (cdr formula) i)
-		(values `(and (implies ,f) (implies ,(reverse f))) k)))	
+     (multiple-value-bind (f k)
+	 (pre-aux (cdr formula) i)
+       (values `(and (implies ,f) (implies ,(reverse f))) k)))	
     ((and (listp formula)
           (equal (car formula) 'not)
 	  (= (length formula) 2))
-     (multiple-value-bind (f k) (preproc (cadr formula) i)
-		(values `(not ,f) k)))
+     (multiple-value-bind (f k)
+	 (preproc (cadr formula) i)
+       (values `(not ,f) k)))
     ((and (listp formula)
 	  (equal (car formula) 'implies)
 	  (= (length formula) 3))
-     (multiple-value-bind (f k) (pre-aux (cdr formula) i)
-		(values (cons 'implies f) k)))
+     (multiple-value-bind (f k)
+	 (pre-aux (cdr formula) i)
+       (values (cons 'implies f) k)))
     ((and (listp formula)
 	  (member (car formula) '(and or) :test #'equal)
 	  (= (length formula) 2))
@@ -33,8 +53,9 @@
     ((and (listp formula)
 	  (member (car formula) '(and or) :test #'equal)
 	  (> (length formula) 2))
-     (multiple-value-bind (f k) (pre-aux (cdr formula) i)
-		(values (reduce (lambda (x y) (list (car formula) x y)) f) k)))
+     (multiple-value-bind (f k)
+	 (pre-aux (cdr formula) i)
+       (values (reduce (lambda (x y) (list (car formula) x y)) f) k)))
     ((and (listp formula)
 	  (> (length formula) 1)
 	  (symbolp (car formula))
@@ -44,10 +65,11 @@
           (member (car formula) '(exists forall) :test #'equal)
           (variable? (cadr formula))
           (= (length formula) 3))
-     (multiple-value-bind (f k) (preproc (caddr formula) (+ i 1))
-		(values (sublis `((,(cadr formula) . ,(intern (format nil "?X~a" i))))
-				`(,(car formula) ,(cadr formula) ,f))
-			k)))
+     (multiple-value-bind (f k)
+	 (preproc (caddr formula) (+ i 1))
+       (values (sublis `((,(cadr formula) . ,(intern (format nil "?X~a" i))))
+		       `(,(car formula) ,(cadr formula) ,f))
+	       k)))
     (t (error "Invalid Formula ~a" formula)))) 
     
     
@@ -60,3 +82,58 @@
 	(preproc (car f) k)
 	  (progn (push form result)
 		 (setf k j)))))    
+
+
+(defun remove-implies (form)
+  (cond ((atom form) 
+	 form)
+	((equal (car form) 'implies) 
+	 `(or (not ,(remove-implies (cadr form)))
+	      ,(remove-implies (caddr form))))
+	(t
+	 (mapcar #'remove-implies form))))
+
+
+(defun move-not (form)
+  (cond ((atom form) 
+	 form)
+	((equal (car form) 'or)
+	 `(or ,(move-not (cadr form)) ,(move-not (caddr form))))
+	((equal (car form) 'and)
+	 `(and ,(move-not (cadr form)) ,(move-not (caddr form))))
+	((equal (car form) 'not)
+	 (cond ((atom (cadr form))
+		form)
+	       ((equal (caadr form) 'and)
+		`(or ,(move-not `(not ,(cadadr form))) ,(move-not `(not ,(car (cddadr form))))))
+	       ((equal (caadr form) 'or)
+		`(and ,(move-not `(not ,(cadadr form))) ,(move-not `(not ,(car (cddadr form))))))
+	       ((equal (caadr form) 'not)
+		(move-not (cadadr form)))))))
+
+
+(defun dist-and-over-or (form)
+  (cond ((literal? form) 
+	 form)
+	((equal (car form) 'and)
+	 `(and ,(dist-and-over-or (cadr form)) ,(dist-and-over-or (caddr form))))
+	((equal (car form) 'or)
+	 (cond ((eval (cons 'and (mapcar #'literal? (cdr form))))
+		form)
+	       ((and (not (literal? (cadr form))) (equal (caadr form) 'and))
+		`(and ,(dist-and-over-or `(or ,(cadadr form) ,(caddr form)))
+		      ,(dist-and-over-or `(or ,(car (cddadr form)) ,(caddr form)))))
+	       ((and (not (literal? (caddr form))) (equal (caaddr form) 'and))
+		`(and ,(dist-and-over-or `(or ,(cadr form) ,(car (cdaddr form))))
+		      ,(dist-and-over-or `(or ,(cadr form) ,(cadr (cdaddr form))))))
+	       (t
+		(let ((a (dist-and-over-or (cadr form)))
+		      (b (dist-and-over-or (caddr form))))
+		  (if (and (equal a (cadr form)) (equal b (caddr form)))
+		      form
+		      (dist-and-over-or `(or ,a ,b)))))))))
+
+
+(defun to-cnf (form)
+  (dist-and-over-or (move-not (remove-implies form))))
+
