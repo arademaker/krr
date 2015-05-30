@@ -1,4 +1,4 @@
-
+;;
 (in-package :utils)
 
 ;; (setf (symbol-function 'find-all-if) #'remove-if-not)

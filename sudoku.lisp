@@ -34,7 +34,10 @@
   "Each number appears at most once in each row"
   (big (and y 1 9)
     (big (and z 1 9)
-      (big (and x 1 8) `(implies ,(atomic x y z) ,`(not ,(big (or i (+ x 1) 9) (atomic i y z))))))))
+      (big (and x 1 8)
+	`(implies ,(atomic x y z)
+		  (not ,(big (or i (+ x 1) 9)
+			     (atomic i y z))))))))
 
 
 (defun clauses-3 ()
@@ -51,7 +54,10 @@
   "Each number appears at most once in each column"
   (big (and x 1 9)
     (big (and z 1 9)
-      (big (and y 1 8) `(implies ,(atomic x y z) ,`(not ,(big (or i (+ y 1) 9) (atomic x i z))))))))
+      (big (and y 1 8)
+	`(implies ,(atomic x y z)
+		  (not ,(big (or i (+ y 1) 9)
+			     (atomic x i z))))))))
 
 
 (defun clauses-4 ()
@@ -62,16 +68,18 @@
         (big (and j 0 2)
 	  (big (and x 1 3)
 	    (big (and y 1 2)
-	      (big (and k (+ y 1) 3) `(or (not ,(atomic (+ x (* 3 i)) (+ y (* 3 j)) z))
-	  				  (not ,(atomic (+ x (* 3 i)) (+ k (* 3 j)) z)))))))))
+	      (big (and k (+ y 1) 3)
+		`(or (not ,(atomic (+ x (* 3 i)) (+ y (* 3 j)) z))
+		     (not ,(atomic (+ x (* 3 i)) (+ k (* 3 j)) z)))))))))
     ,(big (and z 1 9)
       (big (and i 0 2)
         (big (and j 0 2)
 	  (big (and y 1 3)
 	    (big (and x 1 2)
 	      (big (and k (+ x 1) 3)
-	        (big (and l 1 3) `(or (not ,(atomic (+ x (* 3 i)) (+ y (* 3 j)) z))
-				      (not ,(atomic (+ k (* 3 i)) (+ l (* 3 j)) z))))))))))))
+	        (big (and l 1 3)
+		  `(or (not ,(atomic (+ x (* 3 i)) (+ y (* 3 j)) z))
+		       (not ,(atomic (+ k (* 3 i)) (+ l (* 3 j)) z))))))))))))
 
 
 (defun clauses-4b ()
@@ -81,15 +89,20 @@
       (big (and i 0 2)
         (big (and j 0 2)
 	  (big (and x 1 3)
-	    (big (and y 1 2) `(implies ,(atomic (+ (* 3 i) x) (+ (* 3 j) y) z)
-	                               ,`(not ,(big (or k (+ y 1) 3) (atomic (+ (* 3 i) x) (+ (* 3 j) k) z)))))))))
+	    (big (and y 1 2)
+	      `(implies ,(atomic (+ (* 3 i) x) (+ (* 3 j) y) z)
+			(not ,(big (or k (+ y 1) 3)
+				   (atomic (+ (* 3 i) x)
+					   (+ (* 3 j) k) z)))))))))
     ,(big (and z 1 9)
       (big (and i 0 2)
         (big (and j 0 2)
 	  (big (and y 1 3)
 	    (big (and x 1 2)
-	      (big (and l 1 3) `(implies ,(atomic (+ (* 3 i) x) (+ (* 3 j) y) z)
-	                                 ,`(not ,(big (or k (+ x 1) 3) (atomic (+ (* 3 i) k) (+ (* 3 j) k) z))))))))))))
+	      (big (and l 1 3)
+		`(implies ,(atomic (+ (* 3 i) x) (+ (* 3 j) y) z)
+			 (not ,(big (or k (+ x 1) 3)
+				    (atomic (+ (* 3 i) k) (+ (* 3 j) k) z))))))))))))
 
 
 (defun clauses-5 ()
@@ -106,7 +119,10 @@
   "There is at most one number in each entry"
   (big (and x 1 9)
     (big (and y 1 9)
-      (big (and z 1 8) `(implies ,(atomic x y z) ,`(not ,(big (or i (+ z 1) 9) (atomic x y i))))))))
+      (big (and z 1 8)
+	`(implies ,(atomic x y z)
+		  (not ,(big (or i (+ z 1) 9)
+			     (atomic x y i))))))))
 
 
 (defun clauses-6 ()
