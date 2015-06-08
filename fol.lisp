@@ -160,16 +160,16 @@
   (dist-and-over-or (move-not (remove-implies form))))
 
 
-(defun skol (form &optional (c 0) (d 1))
+(defun skolemization (form &optional (l nil))
   (cond ((and (equal (car form) 'exists)
-              (= c 0))
-         (sublis `((,(cadr form) . ,(intern (format nil "?A~a" d))))
-         	 (skol (caddr form) c (+ d 1))))
+              (null l))
+         (sublis `((,(cadr form) . ,(gensym)))
+         	 (skolemization (caddr form))))
 	((equal (car form) 'exists)
-	 (sublis `((,(cadr form) . 
-	            ,(cons (gensym) (loop for x from 1 to c
-                 			collect (intern (format nil "?X~a" x))))))
-		 (skol (caddr form) c)))
+	 (sublis `((,(cadr form) . ,(cons (gensym) l)))
+		 (skolemization (caddr form) l)))
 	((equal (car form) 'forall)
-         (append `(forall ,(cadr form)) (skol (caddr form) (+ c 1))))
+         (append `(forall ,(cadr form)) (skolemization (caddr form) (push (cadr form) l))))
+        ((member (car form) '(and or implies) :test #'equal)
+         `(,(car form) ,(skolemization (cadr form) l) ,(skolemization (caddr form) l)))
 	(t form)))
