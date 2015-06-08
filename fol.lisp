@@ -4,23 +4,27 @@
 (defun variable? (x)
   (and (symbolp x)
        (equal (char (symbol-name x) 0) #\?)))
-       
-       
+
+
+(defun op? (x)
+  (and (symbolp x)
+       (member x '(not and or implies exists forall equiv)
+	       :test #'equal)))       
+
+
 (defun function? (l)
   (let ((f (car l)))
     (and (symbolp f)
-         (not (equal (char (symbol-name f) 0) #\?))
-         (not (member f '(and or implies exists forall equiv)
-                        :test #'equal))
+         (not (variable? f))
+         (not (op? f))
          (every #'term? (cdr l)))))
 				 
 				 
-(defun term? (x)
-  (or (and (symbolp x)
-           (not (member x '(and or implies exists forall equiv)
-                          :test #'equal)))
-      (variable? x)
-      (function? x)))
+(defun term? (a-form)
+  (or (and (symbolp a-form)
+           (not (op? a-form)))
+      (variable? a-form)
+      (function? a-form)))
       
       
 (defun literal? (form) 
@@ -36,9 +40,8 @@
           (if (member (car form) '(implies and or equiv))
               (length-form (cdr form) (+ n 1))
               (length-form (cdr form) n))
-          (progn
-	    (length-form (cdr form)
-			 (+ n (length-form (car form))))))))
+          (length-form (cdr form)
+		       (+ n (length-form (car form)))))))
 
 
 (defun preproc (formula &optional (i 1))
