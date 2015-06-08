@@ -156,3 +156,17 @@
 (defun to-cnf (form)
   (dist-and-over-or (move-not (remove-implies form))))
 
+
+(defun skol (form &optional (c 0) (d 1))
+  (cond ((and (equal (car form) 'exists)
+              (= c 0))
+         (sublis `((,(cadr form) . ,(intern (format nil "?A~a" d))))
+         	 (skol (caddr form) c (+ d 1))))
+	((equal (car form) 'exists)
+	 (sublis `((,(cadr form) . 
+	            ,(cons (gensym) (loop for x from 1 to c
+                 			collect (intern (format nil "?X~a" x))))))
+		 (skol (caddr form) c)))
+	((equal (car form) 'forall)
+         (append `(forall ,(cadr form)) (skol (caddr form) (+ c 1))))
+	(t form)))
