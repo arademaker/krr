@@ -5,6 +5,28 @@
   (and (symbolp x)
        (equal (char (symbol-name x) 0) #\?)))
 
+
+(defun op? (x)
+  (and (symbolp x)
+       (member x '(not and or implies exists forall equiv)
+	       :test #'equal)))       
+
+
+(defun function? (l)
+  (let ((f (car l)))
+    (and (symbolp f)
+         (not (variable? f))
+         (not (op? f))
+         (every #'term? (cdr l)))))
+				 
+				 
+(defun term? (a-form)
+  (or (and (symbolp a-form)
+           (not (op? a-form)))
+      (variable? a-form)
+      (function? a-form)))
+      
+      
 (defun literal? (form) 
   (or (atom form)
       (and (equal (car form) 'not)
@@ -18,9 +40,8 @@
           (if (member (car form) '(implies and or equiv))
               (length-form (cdr form) (+ n 1))
               (length-form (cdr form) n))
-          (progn
-	    (length-form (cdr form)
-			 (+ n (length-form (car form))))))))
+          (length-form (cdr form)
+		       (+ n (length-form (car form)))))))
 
 
 (defun preproc (formula &optional (i 1))
@@ -57,11 +78,6 @@
 	 (pre-aux (cdr formula) i)
        (values (reduce (lambda (x y) (list (car formula) x y)) f) k)))
     ((and (listp formula)
-	  (> (length formula) 1)
-	  (symbolp (car formula))
-	  (every #'variable? (cdr formula)))
-     (values formula i))
-    ((and (listp formula)
           (member (car formula) '(exists forall) :test #'equal)
           (variable? (cadr formula))
           (= (length formula) 3))
@@ -70,6 +86,12 @@
        (values (sublis `((,(cadr formula) . ,(intern (format nil "?X~a" i))))
 		       `(,(car formula) ,(cadr formula) ,f))
 	       k)))
+    ((and (listp formula)
+	  (> (length formula) 1)
+	  (symbolp (car formula))
+	  (not (equal (char (symbol-name (car formula)) 0) #\?))
+	  (every #'term? (cdr formula)))
+     (values formula i))	       
     (t (error "Invalid Formula ~a" formula)))) 
     
     
