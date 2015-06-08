@@ -169,7 +169,7 @@
 	 (sublis `((,(cadr form) . ,(cons (gensym) l)))
 		 (skolemization (caddr form) l)))
 	((equal (car form) 'forall)
-         (append `(forall ,(cadr form)) (skolemization (caddr form) (push (cadr form) l))))
+         `(forall ,(cadr form) (skolemization (caddr form) (push (cadr form) l))))
         ((member (car form) '(and or implies) :test #'equal)
          `(,(car form) ,(skolemization (cadr form) l) ,(skolemization (caddr form) l)))
 	(t form)))
