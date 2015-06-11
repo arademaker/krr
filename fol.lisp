@@ -173,3 +173,63 @@
         ((member (car form) '(and or implies) :test #'equal)
          `(,(car form) ,(skolemization (cadr form) l) ,(skolemization (caddr form) l)))
 	(t form)))
+
+
+(defun lookup (a env)
+	(if (null env) 
+	    nil
+	    (if (equal (caar env) a) 
+	        (cdar env)
+	        (lookup a (cdr env)))))
+	        
+(defun chasevar (a env)
+    (let ((b (car (lookup a env))))
+         (if b
+             (chasevar b env)	        
+	         a)))
+
+(defun occs (a term env)
+	(cond 
+		((function? term) 
+		    (occsl (cdr term)))
+		((variable? term) 
+		    (or (equal a term) 
+		        (occsl (lookup term env))))
+		(t
+		    nil)))
+
+(defun occsl (a term_list env)
+    (if (null term_list) 
+        nil
+        (or (occs a (car term_list) env) 
+            (occsl a (cdr term_list) env))))
+        
+(defun unify_var (a term env)
+	(cond 
+		((variable? a)
+		 	(if (equal a term)
+				env
+				(cons (list a term) env)))
+		(t
+		    (unify_term a term env))))
+
+(defun unify_term (ts us env)
+    (cond
+        ((variable? ts) 
+            (unify_var (chasevar ts env) (chasevar us env) env))
+        ((variable? us) 
+            (unify_var (chasevar us env) (chasevar ts env) env))
+        ((and (function? ts) (function? us))
+            (if (equal (car ts) (car us)) 
+                (unify_terms (cdr ts) (cdr us) env)
+                env))))
+	        
+(defun unify_terms (ts us env)
+    (if (and (null ts) (null us))
+        env
+        (unify_terms (cdr ts) (cdr us) (unify_term (car ts) (car us) env))))
+
+(defun unify (P1 P2 &optional (env nil))
+    (if (equal (car P1) (car P2))
+        (unify_terms (cdr P1) (cdr P2) env)
+        env))
