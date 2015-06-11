@@ -16,16 +16,26 @@
    #:random-elt
    #:find-all-if
    #:compose))
-
-(defpackage #:tableaux
-  (:use #:cl #:utils #:optima)
-  (:export
-   #:prove
+   
+(defpackage #:fol
+  (:use #:cl #:utils)
+  (:export 
+   #:variable?
+   #:literal?
+   #:preproc
+   #:forall
+   #:exists
    #:implies
    #:equiv
+   #:to-cnf))
+
+(defpackage #:tableaux
+  (:use #:cl #:utils #:optima #:fol)
+  (:export
+   #:prove
    #:formula-sign
    #:formula-frm
    #:equal?))
 
 (defpackage #:tableaux-test
-  (:use #:cl #:tableaux :utils))
+  (:use :cl :tableaux :utils :fol))
