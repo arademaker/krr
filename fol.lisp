@@ -159,3 +159,17 @@
 (defun to-cnf (form)
   (dist-and-over-or (move-not (remove-implies form))))
 
+
+(defun skolemization (form &optional (l nil))
+  (cond ((and (equal (car form) 'exists)
+              (null l))
+         (sublis `((,(cadr form) . ,(gensym)))
+         	 (skolemization (caddr form))))
+	((equal (car form) 'exists)
+	 (sublis `((,(cadr form) . ,(cons (gensym) l)))
+		 (skolemization (caddr form) l)))
+	((equal (car form) 'forall)
+         `(forall ,(cadr form) ,(skolemization (caddr form) (push (cadr form) l))))
+        ((member (car form) '(and or implies) :test #'equal)
+         `(,(car form) ,(skolemization (cadr form) l) ,(skolemization (caddr form) l)))
+	(t form)))
