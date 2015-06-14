@@ -180,11 +180,7 @@
 ;; unification
 
 (defun lookup (a env)
-  (if (null env) 
-      nil
-      (if (equal (caar env) a) 
-	  (cdar env)
-	  (lookup a (cdr env)))))
+  (cdr (assoc a env)))
 
 
 (defun chasevar (a env)
