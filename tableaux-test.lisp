@@ -1,6 +1,10 @@
 
 (in-package :tableaux-test)
 
+(def-suite tableaux-suite :description "The tableaux test suite.")
+
+(in-suite tableaux-suite)
+
 (test tableaux-1
   "test the tableaux prover"
   (is (prove '(and A B)) (list (make-formula 'false 'A)
