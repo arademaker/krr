@@ -160,6 +160,8 @@
   (dist-and-over-or (move-not (remove-implies form))))
 
 
+;; skolemization
+
 (defun skolemization (form &optional (l nil))
   (cond ((and (equal (car form) 'exists)
               (null l))
@@ -174,13 +176,66 @@
          `(,(car form) ,(skolemization (cadr form) l) ,(skolemization (caddr form) l)))
 	(t form)))
 
-(defun in_tableaux (tableaux-list)
-	(do ((tabuleiro (mapcar #'(lambda (i) (subseq tableaux-list i (+ 9 i))) '(0 9 18 27 36 45 54 63 72)))
-	     (line 0 (+ line 1))
-	     (elements nil))
-	     ((= line 9) (reverse elements))
-	     (let ((lista (nth line tabuleiro)))
-	     	(dolist (elt lista elements)
-			 (if (not (equal elt 0))
-				 (push (list (+ line 1) (+ 1 (position elt lista)) elt)
-				       elements))))))
+
+;; unification
+
+(defun lookup (a env)
+  (cdr (assoc a env)))
+
+
+(defun chasevar (a env)
+  (let ((b (car (lookup a env))))
+    (if b
+	(chasevar b env)	        
+	a)))
+
+
+(defun occs (a term env)
+  (cond 
+    ((function? term) 
+     (occsl (cdr term)))
+    ((variable? term) 
+     (or (equal a term) 
+	 (occsl (lookup term env))))
+    (t
+     nil)))
+
+
+(defun occsl (a term_list env)
+  (if (null term_list) 
+      nil
+      (or (occs a (car term_list) env) 
+	  (occsl a (cdr term_list) env))))
+
+
+(defun unify-var (a term env)
+  (cond 
+    ((variable? a)
+     (if (equal a term)
+	 env
+	 (cons (list a term) env)))
+    (t (unify-term a term env))))
+
+
+(defun unify-term (ts us env)
+  (cond
+    ((variable? ts) 
+     (unify-var (chasevar ts env) (chasevar us env) env))
+    ((variable? us) 
+     (unify-var (chasevar us env) (chasevar ts env) env))
+    ((and (function? ts) (function? us))
+     (if (equal (car ts) (car us)) 
+	 (unify-terms (cdr ts) (cdr us) env)
+	 env))))
+
+
+(defun unify-terms (ts us env)
+  (if (and (null ts) (null us))
+      env
+      (unify-terms (cdr ts) (cdr us) (unify-term (car ts) (car us) env))))
+
+
+(defun unify (P1 P2 &optional (env nil))
+  (if (equal (car P1) (car P2))
+      (unify-terms (cdr P1) (cdr P2) env)
+      env))
