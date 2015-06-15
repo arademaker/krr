@@ -168,7 +168,7 @@
 			collect (digit-char-p c)))))
     (let ((table (make-array '(9 9))))
       (dolist (frm branch table)
-	(if (and (atomic? frm)
+	(if (and (atom frm)
 		 (equal 'true (formula-sign frm)))
 	    (let ((pos (topos (formula-frm frm))))
 	      (setf (aref table (car pos) (cadr pos)) (caddr pos))))))))
