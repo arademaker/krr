@@ -197,3 +197,12 @@
 			 (push (make-formula 'True
 					     (atomic (car i) (cadr i) (caddr i)))
 				   res))))
+
+(defun table (sentence)
+	(let ((res (loop for i from 1 to 81 collect 0)))
+		 (dolist (a sentence res)
+			 (let ((b (symbol-name (formula-frm a))))
+				  (setf (elt res (- (+ (* 9 (parse-integer (subseq b 1 2))) 
+									   (parse-integer (subseq b 2 3)))
+									1))
+						(parse-integer (subseq b 2 3)))))))
