@@ -175,13 +175,6 @@
 	      (setf (aref table (car pos) (cadr pos)) (caddr pos))))))))
 	      
 
-(defun big-and (a-list)
-  (do ((elts (cdr a-list) (cdr elts)) 
-       (res (car a-list)))
-      ((= (length elts) 0) res)
-    (setf res `(and ,(car elts) ,res))))
-
-
 (defun input-tab (tab-list)
   (do ((tabuleiro (mapcar #'(lambda (i) (subseq tab-list i (+ 9 i))) '(0 9 18 27 36 45 54 63 72)))
        (line 0 (+ line 1))
@@ -195,9 +188,8 @@
 
 
 (defun sentence (tab)
-  (let ((res nil)
-	(elts (input-tab tab)))
-    (dolist (i elts (big-and res))
+  (let (res)
+    (dolist (i (input-tab tab) (cons 'and res))
       (push (make-formula 'true (atomic (car i) (cadr i) (caddr i))) res))))
 
 
