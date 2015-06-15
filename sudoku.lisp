@@ -172,3 +172,28 @@
 		 (equal 'true (formula-sign frm)))
 	    (let ((pos (topos (formula-frm frm))))
 	      (setf (aref table (car pos) (cadr pos)) (caddr pos))))))))
+	      
+(defun big-and (a-list)
+	(do ((elts (cdr a-list) (cdr elts)) 
+		 (res (car a-list)))
+		((= (length elts) 0) res)
+		(setf res `(and ,(car elts) ,res))))
+
+(defun input_tab (tab-list)
+	(do ((tabuleiro (mapcar #'(lambda (i) (subseq tab-list i (+ 9 i))) '(0 9 18 27 36 45 54 63 72)))
+		 (line 0 (+ line 1))
+		 (elements nil))
+		((= line 9) (reverse elements))
+		(let ((lista (nth line tabuleiro)))
+			 (dolist (elt lista elements)
+				 (if (not (equal elt 0))
+					 (push (list (+ line 1) (+ 1 (position elt lista)) elt)
+						   elements))))))
+
+(defun sentence (tab)
+	(let ((res nil)
+		  (elts (input_tab tab)))
+		 (dolist (i elts (big-and res))
+			 (push (make-formula 'True
+					     (atomic (car i) (cadr i) (caddr i)))
+				   res))))
