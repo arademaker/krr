@@ -162,19 +162,6 @@
 (defparameter *sudoku-2*
   `(not ,*sudoku-1*))
 
-
-(defun sudoku (branch)
-  (labels ((topos (atom)
-	     (cdr (loop for c across (symbol-name atom)
-			collect (digit-char-p c)))))
-    (let ((table (make-array '(9 9))))
-      (dolist (frm branch table)
-	(if (and (atom frm)
-		 (equal 'true (formula-sign frm)))
-	    (let ((pos (topos (formula-frm frm))))
-	      (setf (aref table (car pos) (cadr pos)) (caddr pos))))))))
-	      
-
 (defun input-tab (tab-list)
   (do ((tabuleiro (mapcar #'(lambda (i) (subseq tab-list i (+ 9 i))) '(0 9 18 27 36 45 54 63 72)))
        (line 0 (+ line 1))
