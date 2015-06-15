@@ -162,6 +162,7 @@
 (defparameter *sudoku-2*
   `(not ,*sudoku-1*))
 
+
 (defun input-tab (tab-list)
   (do ((tabuleiro (mapcar #'(lambda (i) (subseq tab-list i (+ 9 i))) '(0 9 18 27 36 45 54 63 72)))
        (line 0 (+ line 1))
