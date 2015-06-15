@@ -1,7 +1,7 @@
 
 (asdf:defsystem #:krr
   :serial t
-  :depends-on (:optima :levenshtein :alexandria)
+  :depends-on (:optima :levenshtein :alexandria :fiveam)
   :components ((:file "packages")
 	       (:file "utils"    :depends-on ("packages"))
 	       (:file "fol"      :depends-on ("utils"))
