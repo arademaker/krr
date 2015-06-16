@@ -27,15 +27,17 @@
    #:exists
    #:implies
    #:equiv
-   #:to-cnf))
+   #:to-cnf
+   #:length-form))
 
 (defpackage #:tableaux
   (:use #:cl #:utils #:optima #:fol)
   (:export
    #:prove
+   #:make-formula
    #:formula-sign
    #:formula-frm
    #:equal?))
 
 (defpackage #:tableaux-test
-  (:use :cl :tableaux :utils :fol))
+  (:use :cl :tableaux :utils :fol :it.bese.fiveam))
