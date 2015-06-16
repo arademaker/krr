@@ -34,7 +34,7 @@
 
 
 (defun length-form (form &optional (n 0))
-  (if (null form)
+  (if (or (null form) (atom form))
       n
       (if (atom (car form))
           (if (member (car form) '(implies and or equiv))
