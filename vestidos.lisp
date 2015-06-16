@@ -1,5 +1,5 @@
 
-(in-package :tableaux-test)
+(in-package :krr-user)
 
 (defmacro by-person (a b c)
   `(quote ((or ,a ,b ,c)
