@@ -1,5 +1,5 @@
 
-(in-package :tableaux-test)
+(in-package :krr-user)
 
 
 (defun atomic (a b c)
@@ -148,27 +148,48 @@
 	  (big (and y 1 3) (atomic (+ x (* 3 i)) (+ y (* 3 j)) z)))))))
 
 
+
 (defun all-clauses ()
   `(and ,(clauses-1) ,(clauses-2) ,(clauses-3) ,(clauses-4)
 	,(clauses-5) ,(clauses-6) ,(clauses-7) ,(clauses-8)))
 
 
-(defparameter *sudoku-1*
-  `(and ,(all-clauses)
-	S121 S138 S177 S243 S272 S327 S457 S461 S516 S584
-	S613 S714 S745 S793 S822 S858 S986))
 
-(defparameter *sudoku-2*
-  `(not ,*sudoku-1*))
+(defun input-tab (tab-list)
+  (do ((tabuleiro (mapcar #'(lambda (i)
+			      (subseq tab-list i (+ 9 i))) '(0 9 18 27 36 45 54 63 72)))
+       (line 0 (+ line 1))
+       (elements nil))
+      ((= line 9) (reverse elements))
+    (let ((lista (nth line tabuleiro)))
+      (dolist (elt lista elements)
+	(if (not (equal elt 0))
+	    (push (list (+ line 1) (+ 1 (position elt lista)) elt)
+		  elements))))))
 
 
-(defun sudoku (branch)
-  (labels ((topos (atom)
-	     (cdr (loop for c across (symbol-name atom)
-			collect (digit-char-p c)))))
-    (let ((table (make-array '(9 9))))
-      (dolist (frm branch table)
-	(if (and (atomic? frm)
-		 (equal 'true (formula-sign frm)))
-	    (let ((pos (topos (formula-frm frm))))
-	      (setf (aref table (car pos) (cadr pos)) (caddr pos))))))))
+(defun solve-sudoku (tab)
+  (prove `(not (and ,(all-clauses)
+		    ,(cons 'and (mapcar (lambda (i) (atomic (car i) (cadr i) (caddr i)))
+					(input-tab tab)))))))
+
+
+(defun show-sudoku (sentence)
+  (let ((res (loop for i from 1 to 81 collect 0)))
+    (dolist (a sentence res)
+      (let ((b (symbol-name (formula-frm a))))
+	(setf (elt res (- (+ (* 9 (parse-integer (subseq b 1 2))) 
+			     (parse-integer (subseq b 2 3)))
+			  1))
+	      (parse-integer (subseq b 2 3)))))))
+
+
+(defparameter *sudoku-1* '(0 1 8 0 0 0 7 0 0
+			   0 0 0 3 0 0 2 0 0
+			   0 7 0 0 0 0 0 0 0
+			   0 0 0 0 7 1 0 0 0
+			   6 0 0 0 0 0 0 4 0
+			   3 0 0 0 0 0 0 0 0
+			   4 0 0 5 0 0 0 0 3
+			   0 2 0 0 8 0 0 0 0
+			   0 0 0 0 0 0 0 6 0))
