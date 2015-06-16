@@ -27,7 +27,8 @@
    #:exists
    #:implies
    #:equiv
-   #:to-cnf))
+   #:to-cnf
+   #:length-form))
 
 (defpackage #:tableaux
   (:use #:cl #:utils #:optima #:fol)
