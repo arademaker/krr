@@ -160,6 +160,24 @@
   (dist-and-over-or (move-not (remove-implies form))))
 
 
+(defun remove-or (form)
+    (if (literal? form)
+        (list form)
+        (remove-duplicates (mappend #'remove-or (cdr form)) :test #'equal)))
+
+
+(defun cnf-to-clausal (form)
+    (if (literal? form)
+        (list form)
+        (if (equal 'or (car form))
+            (list (remove-or form))
+            (remove-duplicates (mappend #'remove-and (cdr form)) :test #'equal))))
+
+
+(defun to-clausal (form)
+	(cnf-to-clausal (to-cnf form)))
+
+
 ;; skolemization
 
 (defun skolemization (form &optional (l nil))
