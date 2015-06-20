@@ -39,5 +39,12 @@
    #:formula-frm
    #:equal?))
 
-(defpackage #:tableaux-test
-  (:use :cl :tableaux :utils :fol :it.bese.fiveam))
+(defpackage #:resolution
+  (:use #:cl #:utils #:fol))
+
+
+(defpackage #:krr-user
+  (:use :cl :tableaux :utils :fol :it.bese.fiveam #:resolution))
+
+
+

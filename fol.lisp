@@ -78,7 +78,7 @@
 	 (pre-aux (cdr formula) i)
        (values (reduce (lambda (x y) (list (car formula) x y)) f) k)))
     ((and (listp formula)
-          (member (car formula) '(exists forall) :test #'equal)
+           (member (car formula) '(exists forall) :test #'equal)
           (variable? (cadr formula))
           (= (length formula) 3))
      (multiple-value-bind (f k)

@@ -1,5 +1,5 @@
 
-(in-package :tableaux-test)
+(in-package :krr-user)
 
 
 (defun atomic (a b c)
@@ -154,17 +154,10 @@
 	,(clauses-5) ,(clauses-6) ,(clauses-7) ,(clauses-8)))
 
 
-(defparameter *sudoku-1*
-  `(and ,(all-clauses)
-	S121 S138 S177 S243 S272 S327 S457 S461 S516 S584
-	S613 S714 S745 S793 S822 S858 S986))
-
-(defparameter *sudoku-2*
-  `(not ,*sudoku-1*))
-
 
 (defun input-tab (tab-list)
-  (do ((tabuleiro (mapcar #'(lambda (i) (subseq tab-list i (+ 9 i))) '(0 9 18 27 36 45 54 63 72)))
+  (do ((tabuleiro (mapcar #'(lambda (i)
+			      (subseq tab-list i (+ 9 i))) '(0 9 18 27 36 45 54 63 72)))
        (line 0 (+ line 1))
        (elements nil))
       ((= line 9) (reverse elements))
@@ -175,13 +168,13 @@
 		  elements))))))
 
 
-(defun sentence (tab)
-  (let (res)
-    (dolist (i (input-tab tab) (cons 'and res))
-      (push (make-formula 'true (atomic (car i) (cadr i) (caddr i))) res))))
+(defun solve-sudoku (tab)
+  (prove `(not (and ,(all-clauses)
+		    ,(cons 'and (mapcar (lambda (i) (atomic (car i) (cadr i) (caddr i)))
+					(input-tab tab)))))))
 
 
-(defun table (sentence)
+(defun show-sudoku (sentence)
   (let ((res (loop for i from 1 to 81 collect 0)))
     (dolist (a sentence res)
       (let ((b (symbol-name (formula-frm a))))
@@ -189,3 +182,14 @@
 			     (parse-integer (subseq b 2 3)))
 			  1))
 	      (parse-integer (subseq b 2 3)))))))
+
+
+(defparameter *sudoku-1* '(0 1 8 0 0 0 7 0 0
+			   0 0 0 3 0 0 2 0 0
+			   0 7 0 0 0 0 0 0 0
+			   0 0 0 0 7 1 0 0 0
+			   6 0 0 0 0 0 0 4 0
+			   3 0 0 0 0 0 0 0 0
+			   4 0 0 5 0 0 0 0 3
+			   0 2 0 0 8 0 0 0 0
+			   0 0 0 0 0 0 0 6 0))
