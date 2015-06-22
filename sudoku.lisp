@@ -155,17 +155,24 @@
 
 
 
+(defun wft? (tab-list)
+  (and (equal (length tab-list) 81)			
+       (not (loop for elt in tab-list 
+		  thereis (or (< elt 0) (> elt 9))))))
+
 (defun input-tab (tab-list)
-  (do ((tabuleiro (mapcar #'(lambda (i)
-			      (subseq tab-list i (+ 9 i))) '(0 9 18 27 36 45 54 63 72)))
-       (line 0 (+ line 1))
-       (elements nil))
-      ((= line 9) (reverse elements))
-    (let ((lista (nth line tabuleiro)))
-      (dolist (elt lista elements)
-	(if (not (equal elt 0))
-	    (push (list (+ line 1) (+ 1 (position elt lista)) elt)
-		  elements))))))
+  (cond ((wft? tab-list)
+	 (do ((tabuleiro (mapcar #'(lambda (i)
+				     (subseq tab-list i (+ 9 i))) '(0 9 18 27 36 45 54 63 72)))
+	      (line 0 (+ line 1))
+	      (elements nil))
+	     ((= line 9) (reverse elements))
+	   (let ((lista (nth line tabuleiro)))
+	     (dolist (elt lista elements)
+	       (if (not (equal elt 0))
+		   (push (list (+ line 1) (+ 1 (position elt lista)) elt)
+			 elements))))))
+	(t nil)))
 
 
 (defun solve-sudoku (tab)
