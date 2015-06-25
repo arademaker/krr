@@ -139,10 +139,32 @@
 	  (expand-branches news branch-rest 
 			   (append (cdr derivable) non-derivable)))
 	branches)))
+	
+	
+(defun preproc-tableaux (formula)
+  (labels ((map-preproc (formula)
+	     (mapcar #'preproc-tableaux (cdr formula)))) 
+    (cond 
+      ((atom formula)
+       formula)
+      ((equal (car formula) 'equiv)
+       (let ((forms (map-preproc formula)))
+	 `(and ,(cons 'implies forms) ,(cons 'implies (reverse forms)))))
+      ((equal (car formula) 'not)
+       `(not ,(preproc-tableaux (cadr formula))))
+      ((equal (car formula) 'implies)
+       (cons 'implies (map-preproc formula)))
+      ((and (member (car formula) '(or and) :test #'equal)
+	    (> (length formula) 2))		
+       (reduce #'(lambda (x y) `(,(car formula) ,(preproc-tableaux x) ,(preproc-tableaux y)))
+	       (cdr formula)))
+      ((member (car formula) '(or and) :test #'equal)
+       (preproc-tableaux (cadr formula)))		
+      (t nil))))
 
 
 (defun prove (wff &key (test #'every))
-  (do ((branches (list (list (make-formula 'false (preproc wff))))
+  (do ((branches (list (list (make-formula 'false (preproc-tableaux wff))))
 		 (prove-step branches)))
       ((or (null branches)
 	   (funcall test #'full-expanded? branches)) 
