@@ -34,7 +34,7 @@
 
 
 (defun length-form (form &optional (n 0))
-  (if (null form)
+  (if (or (null form) (atom form))
       n
       (if (atom (car form))
           (if (member (car form) '(implies and or equiv))
@@ -158,6 +158,24 @@
 
 (defun to-cnf (form)
   (dist-and-over-or (move-not (remove-implies form))))
+
+
+(defun remove-or (form)
+    (if (literal? form)
+        (list form)
+        (remove-duplicates (mappend #'remove-or (cdr form)) :test #'equal)))
+
+
+(defun cnf-to-clausal (form)
+    (if (literal? form)
+        (list form)
+        (if (equal 'or (car form))
+            (list (remove-or form))
+            (remove-duplicates (mappend #'remove-and (cdr form)) :test #'equal))))
+
+
+(defun to-clausal (form)
+	(cnf-to-clausal (to-cnf form)))
 
 
 ;; skolemization
