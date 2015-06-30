@@ -182,13 +182,15 @@
 
 
 (defun show-sudoku (sentence)
-  (let ((res (make-array '(9 9) :initial-element '0)))
-    (dolist (a sentence res)
-      (let ((b (symbol-name (formula-frm a))))
-	(setf (aref res
-		    (- (parse-integer (subseq b 1 2)) 1)
-		    (- (parse-integer (subseq b 2 3)) 1))
-	      (parse-integer (subseq b 3 4)))))))
+  (cond ((atom (car sentence))
+         (let ((res (make-array '(9 9) :initial-element '0)))
+               (dolist (a sentence res)
+                 (let ((b (symbol-name (formula-frm a))))
+                      (setf (aref res
+                                  (- (parse-integer (subseq b 1 2)) 1)
+                                  (- (parse-integer (subseq b 2 3)) 1))
+                            (parse-integer (subseq b 3 4)))))))
+        (t (loop for tab in sentence collect (show-sudoku tab)))))
 
 
 (defparameter *sudoku-1* '(0 1 8 0 0 0 7 0 0
