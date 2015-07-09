@@ -154,7 +154,6 @@
 	,(clauses-5) ,(clauses-6) ,(clauses-7) ,(clauses-8)))
 
 
-
 (defun wft? (tab-list)
   (and (equal (length tab-list) 81)			
        (not (loop for elt in tab-list 
@@ -184,12 +183,12 @@
 (defun show-sudoku (sentence)
   (cond ((atom (car sentence))
          (let ((res (make-array '(9 9) :initial-element '0)))
-               (dolist (a sentence res)
-                 (let ((b (symbol-name (formula-frm a))))
-                      (setf (aref res
-                                  (- (parse-integer (subseq b 1 2)) 1)
-                                  (- (parse-integer (subseq b 2 3)) 1))
-                            (parse-integer (subseq b 3 4)))))))
+	   (dolist (a sentence res)
+	     (let ((b (symbol-name (formula-frm a))))
+	       (setf (aref res
+			   (- (parse-integer (subseq b 1 2)) 1)
+			   (- (parse-integer (subseq b 2 3)) 1))
+		     (parse-integer (subseq b 3 4)))))))
         (t (loop for tab in sentence collect (show-sudoku tab)))))
 
 
