@@ -277,63 +277,46 @@
 
 ;; unification
 
-(defun lookup (a env)
-  (cdr (assoc a env)))
+(defun unify-var (a b env)
+  (let ((ca (chasevar a env)) (cb (chasevar b env)))
+    (cond ((or (equal a b) (equal ca cb)) env) ;caso já unificado
+	  ((and (equal a ca) (not (equal b cb)))
+	 ;quando não há nenhuma atribuição de "a" no env, mas há atribuição de "b"
+	   (push `(,a . ,b) env))
+	  ((and (equal b cb) (not (equal a ca))) 
+	 ;aqui o mesmo caso, agora com "b" e "a", respectivamente
+	   (push `(,b . ,a) env))
+	  (t nil)))) ;caso em que não há possibilidade de unificação
 
 
-(defun chasevar (a env)
-  (let ((b (car (lookup a env))))
-    (if b
-	(chasevar b env)	        
-	a)))
+(defun unify (ts us env)
+  (cond ((or (not (equal (length ts) (length us)))))
+	((and (null ts) (null us)) env) ;unified
+	(t (let ((a (car ts)) (b (car us)))
+	     (cond ((and (not (atom a)) (not (atom b)))
+		    (unify (cdr ts) (cdr us) (unify a b env))) 
+		   ((and (atom a) (atom b))
+		    (cond ((and (not (variable? a))
+				(not (variable? b))
+				(equal a b)) ;ambos não são variáveis
+			   ;ou seja, podem ser, por exemplo, funções.
+			   (unify (cdr ts) (cdr us) env))
+			  ((and (variable? a) (and (not (variable? b)) (not (op? b))))
+			   (cond ((equal a (chasevar a env))
+				  (unify (cdr ts) (cdr us) ;caso em que há unificação de variável com termo
+					 (push `(,a . ,b) env)))
+				 ((equal b (chasevar a env))
+				  (unify (cdr ts) (cdr us) env))))
+			  ((and (variable? b) (and (not (variable? a)) (not (op? a))))
+			   (cond ((equal b (chasevar b env))
+				  (unify (cdr ts) (cdr us) ;caso em que há unificação de variável com termo
+					 (push `(,b . ,a) env)))
+				 ((equal a (chasevar b env))
+				  (unify (cdr ts) (cdr us) env))))
+			  ((and (variable? a) (variable? b)
+				(let ((new-env (unify-var a b env)))
+				  (if (and (null new-env) env)
+				      nil
+				      (unify (cdr ts) (cdr us) new-env)))))))
+		   (t nil)))))) ;caso em que há erro e não ocorre unificação
 
-
-(defun occs (a term env)
-  (cond 
-    ((function? term) 
-     (occsl (cdr term)))
-    ((variable? term) 
-     (or (equal a term) 
-	 (occsl (lookup term env))))
-    (t
-     nil)))
-
-
-(defun occsl (a term_list env)
-  (if (null term_list) 
-      nil
-      (or (occs a (car term_list) env) 
-	  (occsl a (cdr term_list) env))))
-
-
-(defun unify-var (a term env)
-  (cond 
-    ((variable? a)
-     (if (equal a term)
-	 env
-	 (cons (list a term) env)))
-    (t (unify-term a term env))))
-
-
-(defun unify-term (ts us env)
-  (cond
-    ((variable? ts) 
-     (unify-var (chasevar ts env) (chasevar us env) env))
-    ((variable? us) 
-     (unify-var (chasevar us env) (chasevar ts env) env))
-    ((and (function? ts) (function? us))
-     (if (equal (car ts) (car us)) 
-	 (unify-terms (cdr ts) (cdr us) env)
-	 env))))
-
-
-(defun unify-terms (ts us env)
-  (if (and (null ts) (null us))
-      env
-      (unify-terms (cdr ts) (cdr us) (unify-term (car ts) (car us) env))))
-
-
-(defun unify (P1 P2 &optional (env nil))
-  (if (equal (car P1) (car P2))
-      (unify-terms (cdr P1) (cdr P2) env)
-      env))
