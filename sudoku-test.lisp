@@ -1,3 +1,28 @@
+(defun gen-sudoku (n) ;n é o número de elementos iniciais gerados
+  (labels ((gen-empty-list ()
+	     (let ((res nil))
+	       (dotimes (i 81 res) (push 0 res)))))
+    (do ((table (gen-empty-list))
+	 (line (random 9) (random 9))
+	 (column (random 9) (random 9))
+	 (number (random 9) (random 9))
+	 (k 0 (incf k)))
+	((= k n) table)
+      (if (good-elt? number line column table)
+	  (setf (elt table (+ (* line 9) column)) number)))))
+
+(defun good-elt? (n line column table)
+  (let ((flag1 nil) (flag2 nil))
+    (not (or (loop for i in (subseq table (* line 9) (* (1+ line) 9))
+		 if (= n i) return t)
+	      (dotimes (i 9 flag1) (if (= (elt table (+ (* 9 i) column)) n)
+				      (setf flag1 t)))
+	      (let* ((aux-line (floor (/ line 3))) (aux-column (floor (/ column 3)))
+		    (start (+ (* aux-line 9) (* aux-column 3))))
+		(dotimes (i 3 flag2)
+		  (loop for elt in (subseq table (+ (* 9 i) start) 
+					   (+ (* 9 i) start 3)) if (= elt n) return (setf flag2 t)))))))))
+
 (test input-tab
       ;; caso em que há elementos maiores que 9
       (is (equal nil (input-tab
