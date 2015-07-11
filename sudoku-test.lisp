@@ -1,3 +1,5 @@
+(in-package :krr-user)
+
 (defun gen-sudoku (n) ;n é o número de elementos iniciais gerados
   (labels ((gen-empty-list ()
 	     (let ((res nil))
