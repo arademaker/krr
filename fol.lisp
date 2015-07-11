@@ -279,44 +279,52 @@
 
 (defun unify-var (a b env)
   (let ((ca (chasevar a env)) (cb (chasevar b env)))
-    (cond ((or (equal a b) (equal ca cb)) env) ;caso já unificado
-	  ((and (equal a ca) (not (equal b cb)))
-	 ;quando não há nenhuma atribuição de "a" no env, mas há atribuição de "b"
-	   (push `(,a . ,b) env))
-	  ((and (equal b cb) (not (equal a ca))) 
-	 ;aqui o mesmo caso, agora com "b" e "a", respectivamente
-	   (push `(,b . ,a) env))
-	  (t nil)))) ;caso em que não há possibilidade de unificação
+    (cond
+      ;; caso já unificado
+      ((or (equal a b) (equal ca cb)) env)
+      ;; quando não há nenhuma atribuição de "a" no env, mas há atribuição de "b"
+      ((and (equal a ca) (not (equal b cb)))
+       (push `(,a . ,b) env))
+      ;; aqui o mesmo caso, agora com "b" e "a", respectivamente
+      ((and (equal b cb) (not (equal a ca))) 
+       (push `(,b . ,a) env))
+      ;; caso em que não há possibilidade de unificação
+      (t nil))))   
 
 
 (defun unify (ts us env)
-  (cond ((or (not (equal (length ts) (length us)))))
-	((and (null ts) (null us)) env) ;unified
-	(t (let ((a (car ts)) (b (car us)))
-	     (cond ((and (not (atom a)) (not (atom b)))
-		    (unify (cdr ts) (cdr us) (unify a b env))) 
-		   ((and (atom a) (atom b))
-		    (cond ((and (not (variable? a))
-				(not (variable? b))
-				(equal a b)) ;ambos não são variáveis
-			   ;ou seja, podem ser, por exemplo, funções.
-			   (unify (cdr ts) (cdr us) env))
-			  ((and (variable? a) (and (not (variable? b)) (not (op? b))))
-			   (cond ((equal a (chasevar a env))
-				  (unify (cdr ts) (cdr us) ;caso em que há unificação de variável com termo
-					 (push `(,a . ,b) env)))
-				 ((equal b (chasevar a env))
-				  (unify (cdr ts) (cdr us) env))))
-			  ((and (variable? b) (and (not (variable? a)) (not (op? a))))
-			   (cond ((equal b (chasevar b env))
-				  (unify (cdr ts) (cdr us) ;caso em que há unificação de variável com termo
-					 (push `(,b . ,a) env)))
-				 ((equal a (chasevar b env))
-				  (unify (cdr ts) (cdr us) env))))
-			  ((and (variable? a) (variable? b)
-				(let ((new-env (unify-var a b env)))
-				  (if (and (null new-env) env)
-				      nil
-				      (unify (cdr ts) (cdr us) new-env)))))))
-		   (t nil)))))) ;caso em que há erro e não ocorre unificação
+  (cond
+    ((or (not (equal (length ts) (length us)))))
+    ((and (null ts) (null us)) env)	;unified
+    (t (let ((a (car ts)) (b (car us)))
+	 (cond
+	   ((and (not (atom a)) (not (atom b)))
+	    (unify (cdr ts) (cdr us) (unify a b env))) 
+	   ((and (atom a) (atom b))
+	    (cond
+	      ((and (not (variable? a))
+		    (not (variable? b))
+		    (equal a b))	;ambos não são variáveis
+					;ou seja, podem ser, por exemplo, funções.
+	       (unify (cdr ts) (cdr us) env))
+	      ((and (variable? a) (and (not (variable? b)) (not (op? b))))
+	       (cond
+		 ((equal a (chasevar a env))
+		  (unify (cdr ts) (cdr us) ;caso em que há unificação de variável com termo
+			 (push `(,a . ,b) env)))
+		 ((equal b (chasevar a env))
+		  (unify (cdr ts) (cdr us) env))))
+	      ((and (variable? b) (and (not (variable? a)) (not (op? a))))
+	       (cond
+		 ((equal b (chasevar b env))
+		  (unify (cdr ts) (cdr us) ;caso em que há unificação de variável com termo
+			 (push `(,b . ,a) env)))
+		 ((equal a (chasevar b env))
+		  (unify (cdr ts) (cdr us) env))))
+	      ((and (variable? a) (variable? b)
+		    (let ((new-env (unify-var a b env)))
+		      (if (and (null new-env) env)
+			  nil
+			  (unify (cdr ts) (cdr us) new-env)))))))
+	   (t nil))))))	  ;caso em que há erro e não ocorre unificação
 
