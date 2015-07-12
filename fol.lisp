@@ -280,7 +280,7 @@
   (cdr (assoc a env)))
 
 (defun chasevar (a env)
-  (let ((b (car (lookup a env))))
+  (let ((b (lookup a env)))
     (if b
 	(chasevar b env)	        
 	a)))
