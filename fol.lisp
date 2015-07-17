@@ -1,5 +1,5 @@
 
-(in-package :fol)
+(in-package :krr-user)
 
 (defun variable? (x)
   (and (symbolp x)
@@ -276,6 +276,14 @@
 
 
 ;; unification
+(defun lookup (a env)
+  (cdr (assoc a env)))
+
+(defun chasevar (a env)
+  (let ((b (lookup a env)))
+    (if b
+	(chasevar b env)	        
+	a)))
 
 (defun unify-var (a b env)
   (let ((ca (chasevar a env)) (cb (chasevar b env)))
