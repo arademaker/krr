@@ -130,7 +130,7 @@
     (split-aux branches nil nil)))
 
 
-(defun prove-step (branches)
+(function-cache:defcached prove-step (branches)
   (multiple-value-bind (derivable non-derivable)
       (split branches)
     (if derivable
