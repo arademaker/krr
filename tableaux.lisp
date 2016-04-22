@@ -55,7 +55,7 @@
       (values nil branch)))
 
 
-(defun apply-rule (formula)
+(function-cache:defcached apply-rule (formula)
   "The [match] function from optima library provides pattern-matching
    functionality."
   (with-slots ((wff frm) sign) formula  
@@ -130,7 +130,7 @@
     (split-aux branches nil nil)))
 
 
-(function-cache:defcached prove-step (branches)
+(defun prove-step (branches)
   (multiple-value-bind (derivable non-derivable)
       (split branches)
     (if derivable
