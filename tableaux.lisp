@@ -35,24 +35,23 @@
 
 (defun cost (a-formula)
   (with-slots (sign frm) a-formula
-    (match (list (car frm) sign)
-      ('(and true)  1)
-      ('(and false) 2)
-      ('(or true)   2)
-      ('(or false)  1)
-      ('(implies true)  2)
-      ('(implies false) 1)
-      ((or '(not true) '(not false)) 1))))
+    (if (listp frm)
+	(match (list (car frm) sign)
+	  ('(and true)  1)
+	  ('(and false) 2)
+	  ('(or true)   2)
+	  ('(or false)  1)
+	  ('(implies true)  2)
+	  ('(implies false) 1)
+	  ((or '(not true) '(not false)) 1))
+	5)))
 
 
 (defun derive (branch)
-  "Given a branch, select a formula to be decomposed according the rules."
-  (if (remove-if #'atomic? branch)
-      (let* ((frm (car (sort (remove-if #'atomic? branch) 
-			     #'< :key #'cost)))
-	     (rest (remove frm branch :test #'equal))) 
-	(values (apply-rule frm) rest))
-      (values nil branch)))
+  "Given a derivable branch, select a formula to be decomposed
+   according the rules."
+  (let* ((frm (cl-heap:dequeue branch))) 
+    (values (apply-rule frm) branch)))
 
 
 (function-cache:defcached apply-rule (formula)
@@ -86,7 +85,9 @@
 
 
 (defun full-expanded? (branch)
-  (every #'atomic? branch))
+  (atomic? (cl-heap:peep-at-queue branch))
+  ;(every #'atomic? branch)
+  )
 
 
 (defun expand-branch (frms branch)
@@ -119,6 +120,8 @@
 ;;     (split-aux branches nil nil)))
 
 (defun split (branches)
+  "The first branch not fulled expanded will be in the firt value and
+   the others will be returned in the second value."
   (labels ((split-aux (branches derivable non-derivable)
 	     (if (null branches)
 		 (values derivable non-derivable)
@@ -164,9 +167,12 @@
 
 
 (defun prove (wff &key (test #'every))
-  (do ((branches (list (list (make-formula 'false (preproc-tableaux wff))))
-		 (prove-step branches)))
-      ((or (null branches)
-	   (funcall test #'full-expanded? branches)) 
-       (remove-if-not #'full-expanded? branches))
-    (dbg :tableaux "Branches: ~a~%" (length branches))))
+  (let ((branch (make-instance 'cl-heap:priority-queue))
+	(input  (make-formula 'false (preproc-tableaux wff))))
+    (cl-heap:enqueue branch input (cost input))
+    (do ((branches (list branch)
+		   (prove-step branches)))
+	((or (null branches)
+	     (funcall test #'full-expanded? branches)) 
+	 (remove-if-not #'full-expanded? branches))
+      (dbg :tableaux "Branches: ~a~%" (length branches)))))

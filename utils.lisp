@@ -43,10 +43,16 @@
 
 (defvar *dbg-ids* nil "Identifiers used by dbg")
 
-(defun dbg (id format-string &rest args)
-  "Print debugging info if (DEBUG ID) has been specified."
-  (when (member id *dbg-ids*)
-    (format *debug-io* "~&~?" format-string args)))
+;; (defun dbg (id format-string &rest args)
+;;   "Print debugging info if (DEBUG ID) has been specified."
+;;   (when (member id *dbg-ids*)
+;;     (format *debug-io* "~&~?" format-string args)))
+
+(defmacro dbg (id format-string &rest args)
+  "Print debugging info if (DEBUG ID) has been specified. The macro
+   makes the cost of computing args only relevant when necessary."
+  `(when (member ,id *dbg-ids*)
+     (format *debug-io* "~&~?" ,format-string ,@args)))
 
 (defun dbg-on (&rest ids)
   "Start dbg output on the given ids."
